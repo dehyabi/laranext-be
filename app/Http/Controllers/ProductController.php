@@ -28,7 +28,21 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->all();
+        $validator = \Validator::make($data, [
+            'name' => 'required|max:255',
+            'price' => 'required|numeric',
+            'stock' => 'required|numeric'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        if (!empty($data['image'])) {
+            $data['image'] = $request->file('image')->store('public/products');
+        }
+        return Product::create($data);
     }
 
     /**
